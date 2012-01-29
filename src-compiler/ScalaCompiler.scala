@@ -29,7 +29,7 @@ class PlayScalaCompiler(app: File, libs: File, classpath: List[File], output: Fi
     // System.setProperty("xsbt.inc.debug", "true")
     
     val sbt = new Launch
-    val scalaProvider = sbt.getScala("2.8.1")
+    val scalaProvider = sbt.getScala("2.9.1")
     val appProvider = scalaProvider.app(AppID("play", "application", "1.0", "", Array(), false, Array()))
     val appConfig = new AppConfiguration(Array(), app, appProvider)
     val compilers = SbtCompiler.compilers(ClasspathOptions(bootLibrary=true, compiler=true, extra=true, autoBoot=true, filterLibrary=true))(appConfig, SbtLogger)
@@ -200,7 +200,7 @@ class PlayScalaCompiler(app: File, libs: File, classpath: List[File], output: Fi
 
                     def component(componentID: String) = {
                         componentID match {
-                            case "compiler-interface-bin_2.8.1.final" => Array(new File(libs, "../dlib/compiler-interface-bin-0.9.10.jar"))
+                            case "compiler-interface-bin_2.9.1.final" => Array(new File(libs, "../dlib/compiler-interface-bin-0.11.2.jar"))
                             case _ => Array[File]()
                         }
                     }
