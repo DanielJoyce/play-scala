@@ -1,7 +1,8 @@
 package play.scalasupport.compiler
 
-import _root_.xsbt.boot.{AppID, Provider, Launcher, IvyOptions, Locks, AppConfiguration}
+import _root_.xsbt.boot.{AppID, Provider, Launcher, IvyOptions, Locks, AppConfiguration,Copy}
 import _root_.sbt.{Compiler => SbtCompiler, Level, CompileOrder, Logger => SbtLoggerAPI, ClasspathOptions}
+import _root_.sbt.inc.Locate
 
 import java.io.{File, FileOutputStream}
 
@@ -50,7 +51,7 @@ class PlayScalaCompiler(app: File, libs: File, classpath: List[File], output: Fi
     // then you get Either(compilationError, (updatedClasses,removedClasses))    
     def update(sources:List[File]):Either[CompilationError,(List[ClassDefinition], List[ClassDefinition])] = {        
         try {
-            val inputs = SbtCompiler.inputs(classpath, sources, output, Nil/*Seq("-verbose")*/, Seq("-g"), 1, order)(compilers, SbtLogger)        
+            val inputs = SbtCompiler.inputs(classpath, sources, output, Nil/*Seq("-verbose")*/, Seq("-g"), Locate.definesClass, 1, order)(compilers, SbtLogger)        
             
             val result = SbtCompiler(inputs, SbtLogger)
             val (stamps,relations) = result.stamps -> result.relations
@@ -115,7 +116,7 @@ class PlayScalaCompiler(app: File, libs: File, classpath: List[File], output: Fi
                     )
                 )
             }
-            case e:java.lang.reflect.InvocationTargetException => error(e.getTargetException.getMessage)
+            case e:java.lang.reflect.InvocationTargetException => sys.error(e.getTargetException.getMessage)
         }
     }
     
@@ -154,7 +155,12 @@ class PlayScalaCompiler(app: File, libs: File, classpath: List[File], output: Fi
         val updateLockFile = new File(tmpDirectory, "boot.lock")
 
         def globalLock: xsbti.GlobalLock = Locks
+        def checksums = ivyOptions.checksums.toArray[String]
+        def ivyRepositories = ivyOptions.repositories.toArray
         
+        def componentLocation(id: String): File = new File(tmpDirectory, id)
+        def addToComponent(id: String, files: Array[File]): Boolean = Copy(files.toList, componentLocation(id))
+    
         // We don't use SBT dependencies management… so will allow a bunch of null here
         def ivyHome = null
 
@@ -211,6 +217,10 @@ class PlayScalaCompiler(app: File, libs: File, classpath: List[File], output: Fi
 
                     def lockFile = new File(tmpDirectory, "components.lock")
 
+                    def componentLocation(id: String): File = new File(tmpDirectory, id)
+          
+                    def addToComponent(id: String, files: Array[File]): Boolean =
+                        Copy(files.toList, componentLocation(id))
                 }
             }
         }
