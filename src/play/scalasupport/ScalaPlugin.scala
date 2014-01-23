@@ -162,7 +162,7 @@ class ScalaPlugin extends PlayPlugin {
 
     // ----- Compiler interface
 
-    val compiler = new PlayScalaCompiler(
+    val compiler = new PlayScalaZincCompiler(
         Play.applicationPath, 
         new File(Play.modules("scala").getRealFile, "lib"), 
         System.getProperty("java.class.path").split(System.getProperty("path.separator")).map(new File(_)).toList, 
