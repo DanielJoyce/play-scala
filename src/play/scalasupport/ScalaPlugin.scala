@@ -8,17 +8,15 @@ import play.classloading.ApplicationClasses.ApplicationClass
 import play.scalasupport.compiler._
 import play.classloading.HotswapAgent
 import play.templates._
-
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.HashMap
-
 import java.util.{List => JList, Map => JMap}
 import java.net.URLClassLoader
 import java.io.{File, PrintStream, ByteArrayOutputStream}
-
 import org.scalatest.{Suite, Assertions}
 import org.scalatest.tools.ScalaTestRunner
+import akka.actor.ActorSystem
 
 class ScalaPlugin extends PlayPlugin {
 
