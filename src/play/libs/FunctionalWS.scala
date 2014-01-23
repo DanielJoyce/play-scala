@@ -20,7 +20,7 @@ case class UndesiredStatus(statusCode: Int, body: String) {
 
 case class ResponseBody(private val response: HttpResponse) {
     import scala.collection.JavaConversions
-    import dispatch.json.Js
+    import dispatch.classic.json.Js
 
     def getXml() = xml.XML.loadString(response.getString())
     def getJson() = Js(response.getString())

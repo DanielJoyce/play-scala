@@ -7,7 +7,7 @@ import org.scalatest.junit._
 
 import play.Play
 import play.test.BaseTest
-import play.test.TestEngine.{TestResults, TestResult}
+import play.test.TestEngine.{ TestResults, TestResult }
 
 object ScalaTestRunner {
 
@@ -16,32 +16,35 @@ object ScalaTestRunner {
             val suite = suiteClass.newInstance
             run(suite)
         } catch {
-            case e => val results = new TestResults
-                      val result = new TestResult
-                      result.name = "Test creation"
-                      result.time = 0
-                      result.error = e.getMessage
+            case e =>
+                val results = new TestResults
+                val result = new TestResult
+                result.name = "Test creation"
+                result.time = 0
+                result.error = e.getMessage
 
-                      val tmpout = new java.io.StringWriter
-                      e.printStackTrace(new java.io.PrintWriter(tmpout))
-                      result.trace = tmpout.toString
+                val tmpout = new java.io.StringWriter
+                e.printStackTrace(new java.io.PrintWriter(tmpout))
+                result.trace = tmpout.toString
 
-                      import util.control.Breaks._
+                import util.control.Breaks._
 
-                      breakable { for(se <- e.getStackTrace) {
-                          if(se.getClassName.equals(suiteClass.getName) || se.getClassName.startsWith(suiteClass.getName+"$")) {
-                              result.sourceInfos = "In " + Play.classes.getApplicationClass(suiteClass.getName).javaFile.relativePath() + ", line " + se.getLineNumber
-                              result.sourceCode = Play.classes.getApplicationClass(suiteClass.getName).javaSource.split("\n")(se.getLineNumber-1)
-                              result.sourceFile = Play.classes.getApplicationClass(suiteClass.getName).javaFile.relativePath
-                              result.sourceLine = se.getLineNumber
-                              break
-                          }
-                      } }
+                breakable {
+                    for (se <- e.getStackTrace) {
+                        if (se.getClassName.equals(suiteClass.getName) || se.getClassName.startsWith(suiteClass.getName + "$")) {
+                            result.sourceInfos = "In " + Play.classes.getApplicationClass(suiteClass.getName).javaFile.relativePath() + ", line " + se.getLineNumber
+                            result.sourceCode = Play.classes.getApplicationClass(suiteClass.getName).javaSource.split("\n")(se.getLineNumber - 1)
+                            result.sourceFile = Play.classes.getApplicationClass(suiteClass.getName).javaFile.relativePath
+                            result.sourceLine = se.getLineNumber
+                            break
+                        }
+                    }
+                }
 
-                      result.passed = false
-                      results.passed = false
-                      results add result
-                      results
+                result.passed = false
+                results.passed = false
+                results add result
+                results
 
         }
     }
@@ -54,7 +57,7 @@ object ScalaTestRunner {
     def run(suite: Suite) = {
         val reporter = new PlayReporter
         val dispatch = new DispatchReporter(List(reporter), System.out)
-        val runner = new SuiteRunner(suite, dispatch, NoStop, new Filter(None, Set[String]()), Map[String,Any](), None, new Tracker(new Ordinal(1)))
+        val runner = new SuiteRunner(suite, dispatch, NoStop, new Filter(None, Set[String]()), Map[String, Any](), None, new Tracker(new Ordinal(1)))
         runner.run()
         dispatch.dispatchDisposeAndWaitUntilDone()
         reporter.results
@@ -66,7 +69,7 @@ class PlayReporter extends Reporter {
 
     val results = new TestResults
 
-    def apply(event : Event) {
+    def apply(event: Event) {
         event match {
 
             case TestSucceeded(ordinal, suiteName, suiteClassName, testName, duration, formatter, rerunnable, payload, threadName, timeStamp) =>
@@ -81,7 +84,7 @@ class PlayReporter extends Reporter {
                 result.time = -1
                 results add result
 
-            case TestFailed(ordinal, message, suiteName, suiteClassName, testName, throwable, duration, formatter, rerunnable, payload, threadName, timeStamp) => 
+            case TestFailed(ordinal, message, suiteName, suiteClassName, testName, throwable, duration, formatter, rerunnable, payload, threadName, timeStamp) =>
                 val result = new TestResult
                 result.name = testName
                 result.time = duration.getOrElse(0)
@@ -94,34 +97,38 @@ class PlayReporter extends Reporter {
                 }
 
                 throwable match {
-                    case Some(e: StackDepth) => val se = e.getStackTrace()(e.failedCodeStackDepth)
-                                               result.sourceInfos = "In " + e.failedCodeFileNameAndLineNumberString.getOrElse("(unknow)").replace(":", ", ")
-                                               result.sourceFile = Play.classes.getApplicationClass(se.getClassName).javaFile.relativePath
-                                               result.sourceLine = se.getLineNumber
-                                               result.sourceCode = Play.classes.getApplicationClass(se.getClassName).javaSource.split("\n")(se.getLineNumber-1)
-                    
-                    case Some(e) => val tmpout = new java.io.StringWriter
-                                    e.printStackTrace(new java.io.PrintWriter(tmpout))
-                                    result.trace = tmpout.toString
+                    case Some(e: StackDepth) =>
+                        val se = e.getStackTrace()(e.failedCodeStackDepth)
+                        result.sourceInfos = "In " + e.failedCodeFileNameAndLineNumberString.getOrElse("(unknow)").replace(":", ", ")
+                        result.sourceFile = Play.classes.getApplicationClass(se.getClassName).javaFile.relativePath
+                        result.sourceLine = se.getLineNumber
+                        result.sourceCode = Play.classes.getApplicationClass(se.getClassName).javaSource.split("\n")(se.getLineNumber - 1)
 
-                                    import util.control.Breaks._
+                    case Some(e) =>
+                        val tmpout = new java.io.StringWriter
+                        e.printStackTrace(new java.io.PrintWriter(tmpout))
+                        result.trace = tmpout.toString
 
-                                    breakable { for(se <- e.getStackTrace) {
-                                        if(se.getClassName.equals(suiteClassName.get) || se.getClassName.startsWith(suiteClassName.get+"$")) {
-                                            result.sourceInfos = "In " + Play.classes.getApplicationClass(suiteClassName.get).javaFile.relativePath() + ", line " + se.getLineNumber
-                                            result.sourceCode = Play.classes.getApplicationClass(suiteClassName.get).javaSource.split("\n")(se.getLineNumber-1)
-                                            result.sourceFile = Play.classes.getApplicationClass(suiteClassName.get).javaFile.relativePath
-                                            result.sourceLine = se.getLineNumber
-                                            break
-                                        }
-                                    } }
-                    
+                        import util.control.Breaks._
+
+                        breakable {
+                            for (se <- e.getStackTrace) {
+                                if (se.getClassName.equals(suiteClassName.get) || se.getClassName.startsWith(suiteClassName.get + "$")) {
+                                    result.sourceInfos = "In " + Play.classes.getApplicationClass(suiteClassName.get).javaFile.relativePath() + ", line " + se.getLineNumber
+                                    result.sourceCode = Play.classes.getApplicationClass(suiteClassName.get).javaSource.split("\n")(se.getLineNumber - 1)
+                                    result.sourceFile = Play.classes.getApplicationClass(suiteClassName.get).javaFile.relativePath
+                                    result.sourceLine = se.getLineNumber
+                                    break
+                                }
+                            }
+                        }
+
                     case _ => // No source informations?
                 }
-                
+
                 results add result
 
-            case _ => 
+            case _ =>
 
         }
     }

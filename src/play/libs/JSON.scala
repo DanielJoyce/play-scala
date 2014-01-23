@@ -1,6 +1,6 @@
 package play.libs
 
-import dispatch.json.{JsValue, JsObject, JsArray, JsString, JsNumber, JsNull}
+import dispatch.classic.json.{JsValue, JsObject, JsArray, JsString, JsNumber, JsNull}
 import sjson.json.{Reads, Writes, Format}
 
 object JSON {

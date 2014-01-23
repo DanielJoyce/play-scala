@@ -5,7 +5,7 @@ import scala.xml.NodeSeq
 import scala.io.Source
 //import scala.collection.JavaConversions._
 
-import dispatch.json.JsValue
+import dispatch.classic.json.JsValue
 import sjson.json.Writes
 
 import java.io.InputStream
